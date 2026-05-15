@@ -548,7 +548,7 @@ float compute_line_conf(float *r)
 
 ## Demo Videos
 
-> Click a thumbnail to open and play the video directly on GitHub.
+> Click a thumbnail to open and play the video .
 
 ### Task 4 — Black line following on real arena
 
