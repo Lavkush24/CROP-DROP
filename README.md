@@ -9,6 +9,7 @@ drops boxes at the correct destination zones.
 
 ## Table of Contents
 - [Project Overview](#project-overview)
+- [Robot Photos](#robot-photos)
 - [Repository Structure](#repository-structure)
 - [Task 1 — Environment Setup & Algorithm Design](#task-1)
 - [Task 2 — Simulation: Color Detection, Navigation & Drop Logic](#task-2)
@@ -20,6 +21,8 @@ drops boxes at the correct destination zones.
 - [Software Stack](#software-stack)
 - [PID Tuning Reference](#pid-tuning)
 - [How to Run](#how-to-run)
+- [Demo Videos](#demo-videos)
+- [Results](#results)
 
 ---
 
@@ -35,6 +38,14 @@ to a fully assembled physical robot running on a real printed arena. Tasks 1–4
 completed successfully. The team was eliminated at Task 5 due to a hardware constraint:
 no single IR sensor mounting height could produce readings that distinguished both
 black and white lines reliably at the same time on the physical arena.
+
+---
+
+## Robot Photos
+
+| Top view | Front view | Side view |
+|:---:|:---:|:---:|
+| ![Top view](top_view.png) | ![Front view](front_view.png) | ![Side view](side_view.png) |
 
 ---
 
@@ -88,7 +99,7 @@ crop_drop/
 The competition required Ubuntu 24 as the working environment.
 
 **What I did:**
-- Installed Ubuntu 24 
+- Installed Ubuntu 24 alongside Windows (dual-boot)
 - Set up CoppeliaSim, Python 3, and all required simulation libraries
 - Configured the socket communication bridge between Python and CoppeliaSim (`Connector.py`)
 
@@ -112,7 +123,7 @@ Implemented a tabular Q-Learning agent as an alternative to PID.
 
 **Key design decisions:**
 - State: discretised sensor reading pattern
-- Actions: `[left_corner, left, straight, right, right_corner]`
+- Actions: `[hard_left, left, straight, right, hard_right]`
 - Reward: +10 on-line, −5 off-line, −1 per step
 - Trained policy serialised to `q_table.pkl` and loaded at inference time
 
@@ -157,33 +168,38 @@ The 5-sensor array gives distinct signatures at junctions vs. straight lines.
 [0.37, 0.03, 0.03, 0.05, 0.03]   → robot centred on junction
 ```
 
-**Condition to stop at junction:**
-```python
-def is_junction(sensors):
-    # All sensors below 0.4 after seeing a high reading = full cross
-    all_low = all(s < 0.4 for s in sensors)
-    return all_low
+**Condition to detect junction:**
+```C
+if(isBlack(c) && !junction && boxPicked) {
+    printf("Node is detected\n");
+    SLEEP(10);
+    set_motor(c,0,0);
+    
+    printf("color of Box: %c\n",colorDetected);
+    char dir = chooseDirection(colorDetected);
+    printf("Turn Direction: %c \n",dir);
+}
 ```
 
 ### 2A — Destination Zone Detection
 
 Instead of using the colour sensor on the floor (unreliable at low angle),
-I used the uniform flat readings the line sensor gives over coloured zones.
+I used the box color to detect the direction as its mapped for each color there sperate direction in which i need to move.
 
-| Zone   | Sensor flat value | Detection condition           |
-|--------|-------------------|-------------------------------|
-| Blue   | ~0.49             | `0.45 ≤ avg(sensors) ≤ 0.52` |
-| Red    | ~0.29–0.33        | `0.27 ≤ avg(sensors) ≤ 0.35` |
-| Green  | ~0.33             | `0.27 ≤ avg(sensors) ≤ 0.35` |
-
-```python
-def detect_destination(sensors, box_color):
-    avg = sum(sensors) / len(sensors)
-    variance = max(sensors) - min(sensors)
-    if variance < 0.06:                      # flat uniform reading = coloured zone
-        if box_color == "blue"  and 0.45 < avg < 0.52: return True
-        if box_color in ("red","green") and 0.27 < avg < 0.36: return True
-    return False
+```C
+char chooseDirection(char boxColor) {
+    char dir;
+    if(boxColor == 'R') {
+        dir = 'L';
+    }
+    else if(boxColor == 'G') {
+        dir = 'R';   
+    }
+    else if(boxColor == 'B') {
+        dir = 'F';
+    }
+    return dir;   
+}
 ```
 
 ### 2B — Dual Line Following + Full Path
@@ -203,15 +219,17 @@ Black line = low reading on the sensor directly above it, high on surroundings.
 
 **Line-type classifier:**
 ```cpp
-bool blackLine(SocketClient *c) {
-    int low_count  = 0;
-    int high_count = 0;
-    for (int i = 0; i < 5; i++) {
-        if (c->line_sensors[i] < 0.4) low_count++;
-        if (c->line_sensors[i] > 0.7) high_count++;
+bool isBlack(SocketClient* c) {
+    float ir1 = c->line_sensors[0];  // left_corner sensor
+    float ir2 = c->line_sensors[1];  // left sensor
+    float ir3 = c->line_sensors[2];  // middle sensor (center)
+    float ir4 = c->line_sensors[3];  // right sensor
+    float ir5 = c->line_sensors[4];
+
+    if(ir1 < 0.4 && ir2 < 0.4 && ir3 < 0.4 && ir4 < 0.4 && ir5 < 0.4) {
+        return true;
     }
-    // Black: exactly 1 sensor is low (the line), rest are high
-    return (low_count == 1 && high_count >= 3);
+    return false;
 }
 ```
 
@@ -254,6 +272,7 @@ STEP files are in `crop_drop_task_3/STEP files/`.
 - Motor drivers wired to the STM32 PWM outputs
 - 5× IR reflectance sensors on underside bracket
 - Colour sensor positioned to read boxes at pick-up height
+- PCB designed in KiCad — Gerber files in `CB_Gerber/`
 
 ### Wiring reference
 See `CB_PCB_schematics.pdf` for full schematic.
@@ -456,9 +475,9 @@ line types at a single fixed height.
 | Motors | DC gear motors × 2 |
 | Line sensors | IR reflectance array × 5 |
 | Colour sensor | TCS3200 (or equivalent) |
-| Gripper | Electromagnet |
+| Gripper | Servo-actuated custom 3D-printed |
 | Power | LiPo battery + regulator |
-| Chassis | Custom 3D-printed |
+| Chassis | Custom 3D-printed (STEP files included) |
 
 ---
 
@@ -498,7 +517,7 @@ Real arena — loaded     1.30    0.02    0.10    3.0
 #    File → Open → Task3_arena_testing_modified.ttt
 
 # 2. Install Python dependencies
-pip install 
+pip install -r requirements.txt
 
 # 3. Train Q-Learning (Task 1C)
 cd CB_3084_Task_1B_rl
@@ -512,13 +531,28 @@ python Test.py --mode rl
 ```
 
 ### Real Hardware (Tasks 4–5)
-
+float compute_line_conf(float *r)
+{
+    float s = 0.0f;
+    for (int i = 0; i < NUM_SENSORS; i++) s += r[i];
+    return s;
+}
 ```bash
 # Flash firmware via STM32CubeIDE
 # Open project in crop_drop_task_4/Task4a_PID
 # Build → Flash to board
 # Place robot on arena start position → power on
 ```
+
+---
+
+## Demo Videos
+
+> Click a thumbnail to open and play the video directly on GitHub.
+
+### Task 4 — Black line following on real arena
+
+[![Task 4 run — black line](v1.png)](https://youtu.be/oO3rsXFNNNE)
 
 ---
 
