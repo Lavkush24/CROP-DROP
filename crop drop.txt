@@ -1,0 +1,124 @@
+Crop Drop Testing ---------
+
+How to use use putty to see output of ir sensor-
+- connect nucleo 
+- check port ls /dev/ttyACM* 
+- start putty using putty -fn "Monospace 12"
+- config it boundrate 115200, serial line to resullt of port
+
+Testing done .
+
+
+Assembly - 
+Base design - 
+	three part 
+		- 1. base
+		- 2. color sensor mount
+		- 3. magnet holder
+		
+		
+	
+Assembly done
+
+
+
+Program writing
+
+1. ir sensor data 
+we get adc values maximum for white and minimum for black
+- first we convert it to a the reflectance percentage 
+	- so now 0 for black and 100 for white but it not giving middle values check why ?????????????????????????????
+	
+
+2. design pid algo
+
+perameter i need 
+	- integral Ki
+	- derivative kd
+	- proportional gain kp
+	- base_speed
+	- prev_error
+	- error
+	
+how to implement-
+
+- 1. initialize error and setpoint by using the weight that introduce to see the bot position on line
+- 2. calculate integral (error*dt)
+- 3. derivative (erro-prevError)/dt
+- 4. correction = kp*error + kd*dervative + ki*integral
+- 5. update prevError
+this correction we use in the to reduce and increase base speed 
+
+tuning of pid - 
+1. start with the ki=0,kd=0, kp = 2 or 3
+2. tune kp 
+	- too small  slowly drift off and not follow
+	- usable - follow line , cuts at corners
+	- critical - sharop follow but oscillation (gold zone)
+	- too large - osiclaltion large like snake
+reach at critical stage and stop
+3. add kd to kill oscillation
+	- start very small like 0.2 to 0.5
+	- usually have value kp * 0.2
+stablize the bot 
+
+💬OBSERVATION - when ki = kd = 0
+- kp stablize at 18 start to follow the staright line 
+- reach till 32 still not turning 
+- small turn at 46 
+
+❌ here stop because its not desirable behaviour
+
+- the wrong tuning because of the position weight {-2,-1,0,1,2} are too small to steer so return the 10 * pos
+
+👉 now start again with the ki=kd = 0 and kp = 15 little oscillation
+⭐ the critical kp = 15-16
+- now add some kd = kp*0.2 = 15*0.2 = 3
+
+🧠 one aligment issue occurs now bot able to follow straight path but it centered on ir4 so 
+	- there are two solution for this 
+		- 1. calibration of each sensor value ⭐important for stable solution that not dependent on the enviroment
+		- 2. setPoint calibration (i use temporary) at setPoint -2.0f
+		
+
+at kp = 19 , ki = 1, kd = 2 base_speed = 80 the bot able to follow path at straignt line .
+
+now i need to turn ????????????????????????????
+
+- one way is by manually providing some push to the bot at corner toward the corner by introduce the turn_boost and speed_scale reduce the speed but its motion is not smooth . ?????????????? think about the motion to be in smooth . 
+
+bot able to follow with accuracy of 80% path at scale 0.8 and turn_boost 1.5  and base_speed 80 and min_speed = 10 but 
+	- PROBLEM  jerky momemts due to turn boost and sometime divert from the line
+
+Before stablize it i need to increase speed from 80 
+
+so. lets retune the parameters 
+kp = 19,ki=1,kd=2 base_speed = 80, min_speed = 10, speed_scale = 0.8 , turn_boost = 1.5
+
+new values ------------
+
+There is error in pid implementation as i am not include the dt term that define how often the pid is calculaed again so i implement it now what i observe 
+- at kp=1,ki=kd = 0 base_speed = 120  it divert and i found the ki=16 at which it start turning but after that till 50 i chekc it has same behaviour the only difference of the zigzag motion but both able to follow path.
+
+its the expected behaviour because at speed 120 its the limit the kp = 20 is the max able to turn the steering . 
+
+for further streeing turn need speed to reduce so introduce the dynamic_speed that decide on the basis of the error 
+
+the error we get at corner is about (1.5 to 2.0 ) if we choose k_speed = 3 (4.5 to 6.0) this is the reduced speed at corners  meaning the speed is reduce by this paraeter more at corner if larger the corner larger the error -> larger the speed correction tune the k_speed if want more to reduce the speed . 
+ dynamic_speed = base_speed - (k_speed*abs(error))
+ 
+ 
+ by using dynamic speed it start to turn but to reduce both tyre speed at turn i need to use the turn_boost and scaling that arise new problem that when i declare these variable golbally than on first corner encounter the speed set to new small values . 
+ so need mecahnism that increse speed slowlly like inreal life . 
+ 
+ MECANISM to increse speed continuously not suddenly 
+
+How to work run motor - 
+
+
+
+
+
+
+
+

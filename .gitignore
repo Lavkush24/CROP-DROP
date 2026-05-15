@@ -1,0 +1,32 @@
+*.vscode
+*.mp4
+videos/
+
+*.zip
+
+__pycache__/
+*.pyc
+asyncio/
+
+*.pkl
+result.json
+
+# crop_drop_task_3/STEP files/
+
+wrapper/
+CB_3084_Task_1B_rl/rl training/wrapper
+CB_3084_Task_1B_rl/wrapper
+crop_drop_task_2/ubuntu 24-20251111T121329Z-1-001/ubuntu 24/wrapper
+crop_drop_task_2/ubuntu 24-20251107T131635Z-1-001/ubuntu 24/wrapper
+
+*.o
+
+
+*.log
+*.tmp
+
+
+# *.pdf
+# *.png
+*.jpeg
+*.jpg

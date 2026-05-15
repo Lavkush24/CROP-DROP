@@ -1,0 +1,318 @@
+CROP DROP BOT - TASK 2A
+
+
+i have the code that run the robo and follow a line 
+
+
+- now first i do is detect the color of the box in the way
+---- How i do it ? ----------------
+- it detect using the color but intially i am not gettting reading due to the problem of time synchronization
+-Color RGB raw values: (0.098, 0.000, 0.000)  for the blue
+-Color RGB raw values: (0.188, 0.569, 0.000)  for red
+-Color RGB raw values: (0.188, 0.000, 0.569) for green
+
+these are difference rendering pipeline of copelliasim there i need to normalize the value to detect the right color
+mapp RGB value according to domianation
+
+ this way is not worked -----------------
+
+trying to implement according to the given values mapping
+
+
+okk Now we have the color of box and loaded box 
+
+- next we need to find the junction and find out the path need to follow
+------------- detect junction--------------
+reading of the path at junction ---------------
+sample 1 ------
+Line sensor readings: [0.83, 0.13, 0.03, 0.17, 0.83]
+Line sensor readings: [0.62, 0.03, 0.03, 0.07, 0.39]
+Line sensor readings: [0.03, 0.03, 0.03, 0.05, 0.03]
+Line sensor readings: [0.03, 0.03, 0.03, 0.05, 0.03]
+Line sensor readings: [0.03, 0.03, 0.03, 0.05, 0.03]
+Line sensor readings: [0.29, 0.03, 0.03, 0.06, 0.32]
+Line sensor readings: [0.29, 0.03, 0.03, 0.06, 0.32]
+Line sensor readings: [0.80, 0.39, 0.06, 0.40, 0.83]
+----------
+sample 2 -----
+Line sensor readings: [0.83, 0.83, 0.03, 0.83, 0.83]
+Line sensor readings: [0.83, 0.83, 0.03, 0.83, 0.83]
+Line sensor readings: [0.83, 0.44, 0.03, 0.46, 0.83]
+Line sensor readings: [0.83, 0.44, 0.03, 0.46, 0.83]
+Line sensor readings: [0.62, 0.03, 0.03, 0.32, 0.63]
+Line sensor readings: [0.37, 0.03, 0.03, 0.05, 0.03]
+----------
+
+straight line reading ------------------
+Line sensor readings: [0.83, 0.83, 0.03, 0.83, 0.83]
+Line sensor readings: [0.83, 0.83, 0.03, 0.83, 0.83]
+Line sensor readings: [0.83, 0.83, 0.03, 0.83, 0.83]
+Line sensor readings: [0.83, 0.83, 0.03, 0.83, 0.83]
+Line sensor readings: [0.83, 0.83, 0.03, 0.83, 0.83]
+--------------------
+
+
+
+okk i create a condition that stop robo on juction using these values - 
+ so - robo is able to stop and decide the path based on the color of box that help to turn on right path .
+ 
+ 
+- no i need to implement drop logic at correct palce 
+- the first think is detect the place 
+ using the color sensor ----- it is not possible using color sensor as it cannnot it tha plane surface values---------
+ 
+ - try with the line sensor reading 
+ reading for red 
+ sample 1 -------------
+ Line sensor readings: [0.59, 0.35, 0.35, 0.35, 0.35]
+Line sensor readings: [0.59, 0.35, 0.35, 0.35, 0.35]
+Line sensor readings: [0.29, 0.29, 0.29, 0.29, 0.29]
+------------------
+
+reading for blue
+sample 1 -------------
+Line sensor readings: [0.83, 0.83, 0.83, 0.73, 0.73]
+Line sensor readings: [0.53, 0.62, 0.49, 0.49, 0.49]
+Line sensor readings: [0.53, 0.62, 0.49, 0.49, 0.49]
+Line sensor readings: [0.49, 0.49, 0.49, 0.49, 0.49]
+Line sensor readings: [0.49, 0.49, 0.49, 0.49, 0.49]
+Line sensor readings: [0.49, 0.49, 0.49, 0.49, 0.49]
+Line sensor readings: [0.49, 0.49, 0.49, 0.49, 0.49]
+Line sensor readings: [0.49, 0.49, 0.49, 0.49, 0.49]
+Line sensor readings: [0.49, 0.49, 0.49, 0.49, 0.49]
+Line sensor readings: [0.63, 0.52, 0.66, 0.64, 0.61]
+Line sensor readings: [0.63, 0.52, 0.66, 0.64, 0.61]
+Line sensor readings: [0.63, 0.52, 0.66, 0.64, 0.61]
+Line sensor readings: [0.83, 0.83, 0.83, 0.83, 0.83]
+------------------
+
+reading for green
+sample 1 ------------------------
+Line sensor readings: [0.83, 0.83, 0.83, 0.83, 0.56]
+Line sensor readings: [0.67, 0.59, 0.33, 0.33, 0.33]
+Line sensor readings: [0.67, 0.59, 0.33, 0.33, 0.33]
+Line sensor readings: [0.67, 0.59, 0.33, 0.33, 0.33]
+Line sensor readings: [0.33, 0.33, 0.33, 0.33, 0.33]
+-----------------------
+ 
+ 
+ 
+ according to these values find the condtiontion to stop the or identify destination and drop the box when it is satisfied
+ 
+ 
+ 
+ 
+ 
+ 
+ ---------------------- TASK 2B---------------------------------
+ 
+ Now i need to implement the task in whick there are there boxs that i need to detect in the path and send the color of the box to backend and ater detection at last box we need to pick and drop at the desirable location
+ 
+ * important thing i need to implement the line follower code for both white as well as black line because both are used
+ 
+ 
+--- first thing make robo able to follow both the lines
+black as well as white
+
+for white line reading -----------------
+sample 1 -------------------
+Line sensor readings: [0.09, 0.09, 0.83, 0.09, 0.09]
+Line sensor readings: [0.09, 0.09, 0.83, 0.09, 0.09]
+Line sensor readings: [0.09, 0.09, 0.83, 0.09, 0.09]
+Line sensor readings: [0.09, 0.09, 0.83, 0.09, 0.09]
+Line sensor readings: [0.09, 0.09, 0.83, 0.09, 0.09]
+Line sensor readings: [0.09, 0.09, 0.83, 0.09, 0.09]
+Line sensor readings: [0.09, 0.09, 0.83, 0.09, 0.09]
+Line sensor readings: [0.09, 0.09, 0.83, 0.09, 0.09]
+Line sensor readings: [0.09, 0.09, 0.82, 0.09, 0.09]
+Line sensor readings: [0.09, 0.09, 0.82, 0.09, 0.09]
+Line sensor readings: [0.09, 0.09, 0.82, 0.09, 0.09]
+Line sensor readings: [0.09, 0.09, 0.82, 0.09, 0.09]
+Line sensor readings: [0.09, 0.09, 0.82, 0.09, 0.09]
+Line sensor readings: [0.09, 0.09, 0.83, 0.09, 0.09]
+Line sensor readings: [0.09, 0.09, 0.83, 0.09, 0.09]
+Line sensor readings: [0.09, 0.09, 0.83, 0.09, 0.09]
+-------------------------
+
+
+now it following the white line at parameter values 
+float Kp = 1.45, Ki = 0.03, Kd = 0.01;
+base_speed = 4.0f
+
+
+now i need to make the robo follow black line
+reading sample -------------
+sample 1 ------------------------
+Line sensor readings: [0.09, 0.54, 0.45, 0.09, 0.09]
+Line sensor readings: [0.09, 0.54, 0.45, 0.09, 0.09]
+Line sensor readings: [0.09, 0.53, 0.46, 0.09, 0.09]
+Line sensor readings: [0.09, 0.72, 0.41, 0.41, 0.39]
+Line sensor readings: [0.09, 0.72, 0.41, 0.41, 0.39]
+Line sensor readings: [0.83, 0.05, 0.58, 0.56, 0.54]
+Line sensor readings: [0.83, 0.03, 0.81, 0.83, 0.83]
+Line sensor readings: [0.83, 0.03, 0.83, 0.83, 0.83]
+Line sensor readings: [0.83, 0.03, 0.83, 0.83, 0.83]
+Line sensor readings: [0.83, 0.03, 0.83, 0.83, 0.83]
+Line sensor readings: [0.83, 0.03, 0.83, 0.83, 0.83]
+Line sensor readings: [0.82, 0.53, 0.03, 0.83, 0.83]
+Line sensor readings: [0.83, 0.83, 0.03, 0.66, 0.83]
+-----------------------
+
+
+
+follow both path simultaneously ---------------
+bool blackLine(SocketClient *c) {
+    int first = 0;
+    int sec = 0;
+
+    for(int i=0; i<5; i++) {
+        if(c->line_sensors[i] > 0.7) {
+            sec++;
+        }
+
+        if(c->line_sensors[i] < 0.4) {
+            first++;
+        }
+    }
+    return first == 1 && sec > 2 ? true : false;
+}
+
+this fauntion not work at corner because of corner readings confliction
+------
+corner 1 -------------
+Line sensor readings: [0.09, 0.70, 0.83, 0.83, 0.83]
+Line sensor readings: [0.09, 0.70, 0.83, 0.83, 0.83]
+Line sensor readings: [0.09, 0.54, 0.83, 0.83, 0.83]
+Line sensor readings: [0.83, 0.83, 0.72, 0.46, 0.09]
+Line sensor readings: [0.83, 0.83, 0.72, 0.46, 0.09]
+----------------
+
+corner 2,3,4 -----------------
+ine sensor readings: [0.83, 0.83, 0.83, 0.48, 0.09]
+Line sensor readings: [0.83, 0.83, 0.83, 0.48, 0.09]
+Line sensor readings: [0.83, 0.83, 0.83, 0.83, 0.09]
+Line sensor readings: [0.83, 0.83, 0.11, 0.83, 0.83]
+Line sensor readings: [0.83, 0.83, 0.03, 0.83, 0.83]
+Line sensor readings: [0.83, 0.51, 0.03, 0.83, 0.83]
+Line sensor readings: [0.83, 0.51, 0.03, 0.83, 0.83]
+Line sensor readings: [0.83, 0.54, 0.03, 0.83, 0.83]
+Line sensor readings: [0.83, 0.54, 0.03, 0.83, 0.83]
+
+-- i need to add the duration for corner values so that they are not pdate too early to this we introduce the corner_duration = 25
+
+
+
+ -- now step is to detect all the boxes
+ i able to detect all boxes by manipulating the color detection function as it have some different reading from the task 2a 
+ 
+ -- able to pick up the box 
+ -* but after pick at corners it not able to turn so, need to set new kp,ki,kd for corners when the box is picked up 
+ 
+ 
+ -- now next is the junction detection in the black line some reading changes after box picked 
+ 
+ 
+ 
+ junction readings ---------------
+ sample 1 -------------
+
+Line sensor readings: [0.50, 0.03, 0.03, 0.30, 0.37]
+Line sensor readings: [0.50, 0.03, 0.03, 0.30, 0.37]
+Line sensor readings: [0.50, 0.03, 0.03, 0.30, 0.37]
+Line sensor readings: [0.03, 0.03, 0.03, 0.03, 0.03]
+Line sensor readings: [0.03, 0.03, 0.03, 0.03, 0.03]
+Line sensor readings: [0.07, 0.03, 0.03, 0.03, 0.03]
+Line sensor readings: [0.07, 0.03, 0.03, 0.03, 0.03]
+Line sensor readings: [0.07, 0.03, 0.03, 0.03, 0.03]
+
+
+sen	min	max
+1	0.03	0.5
+2	0.03	0.03
+3	0.03	0.03
+4 	0.03	0.3
+5	0.03	0.37
+----------------------
+sample 2-----------------
+
+Line sensor readings: [0.26, 0.03, 0.03, 0.03, 0.03]
+Line sensor readings: [0.26, 0.03, 0.03, 0.03, 0.03]
+Line sensor readings: [0.11, 0.03, 0.03, 0.03, 0.09]
+
+
+sen	min	max
+1	0.11	0.26
+2	0.03	0.03
+3	0.03	0.03
+4 	0.03	0.03
+5	0.03	0.09
+---------------------------
+
+from both found min = 0.02 and max = 0.3
+
+
+
+destination readings -----------
+sample for blue-----
+sample 1------------
+Line sensor readings: [0.49, 0.49, 0.49, 0.49, 0.49]
+Line sensor readings: [0.49, 0.49, 0.49, 0.49, 0.49]
+Line sensor readings: [0.49, 0.49, 0.49, 0.49, 0.49]
+Line sensor readings: [0.49, 0.49, 0.49, 0.49, 0.49]
+Line sensor readings: [0.49, 0.49, 0.49, 0.49, 0.49]
+Line sensor readings: [0.49, 0.49, 0.49, 0.49, 0.49]
+Line sensor readings: [0.49, 0.49, 0.49, 0.49, 0.49]
+Line sensor readings: [0.69, 0.67, 0.66, 0.64, 0.63]
+Line sensor readings: [0.69, 0.67, 0.66, 0.64, 0.63]
+Line sensor readings: [0.83, 0.83, 0.83, 0.83, 0.83]
+
+-------------------
+Line sensor readings: [0.49, 0.49, 0.50, 0.50, 0.51]
+Line sensor readings: [0.49, 0.49, 0.50, 0.50, 0.51]
+Line sensor readings: [0.49, 0.49, 0.49, 0.49, 0.49]
+Line sensor readings: [0.49, 0.49, 0.49, 0.49, 0.49]
+Line sensor readings: [0.49, 0.49, 0.49, 0.49, 0.49]
+Line sensor readings: [0.49, 0.49, 0.49, 0.49, 0.49]
+Line sensor readings: [0.49, 0.49, 0.49, 0.49, 0.49]
+Line sensor readings: [0.49, 0.49, 0.49, 0.49, 0.49]
+Line sensor readings: [0.49, 0.49, 0.49, 0.49, 0.49]
+Line sensor readings: [0.49, 0.49, 0.49, 0.49, 0.49]
+Line sensor readings: [0.49, 0.49, 0.49, 0.49, 0.49]
+Line sensor readings: [0.49, 0.64, 0.64, 0.65, 0.66]
+
+
+min for all is 0.49 and max for all is 0.5
+
+sample for green and red----------
+sample 1-----------
+
+Line sensor readings: [0.29, 0.29, 0.31, 0.33, 0.33]
+Line sensor readings: [0.29, 0.29, 0.32, 0.33, 0.33]
+Line sensor readings: [0.29, 0.29, 0.33, 0.33, 0.33]
+Line sensor readings: [0.29, 0.29, 0.33, 0.33, 0.33]
+Line sensor readings: [0.29, 0.29, 0.33, 0.33, 0.33]
+Line sensor readings: [0.29, 0.29, 0.33, 0.33, 0.33]
+Line sensor readings: [0.29, 0.29, 0.33, 0.33, 0.33]
+Line sensor readings: [0.29, 0.29, 0.33, 0.33, 0.33]
+Line sensor readings: [0.29, 0.29, 0.33, 0.33, 0.33]
+
+---------------------------
+min 0.29 and max 0.33
+
+
+
+sample for right concave 
+-------------
+Line sensor readings: [0.09, 0.09, 0.83, 0.09, 0.09]
+Line sensor readings: [0.09, 0.09, 0.83, 0.09, 0.09]
+Line sensor readings: [0.09, 0.10, 0.83, 0.10, 0.38]
+Line sensor readings: [0.09, 0.10, 0.83, 0.41, 0.48]
+Line sensor readings: [0.09, 0.10, 0.83, 0.41, 0.48]
+Line sensor readings: [0.09, 0.11, 0.83, 0.81, 0.83]
+Line sensor readings: [0.09, 0.11, 0.83, 0.81, 0.83]
+Line sensor readings: [0.09, 0.11, 0.83, 0.81, 0.83]
+Line sensor readings: [0.09, 0.44, 0.83, 0.83, 0.79]
+Line sensor readings: [0.09, 0.51, 0.81, 0.55, 0.51]
+Line sensor readings: [0.09, 0.48, 0.51, 0.46, 0.42]
+Line sensor readings: [0.09, 0.48, 0.51, 0.46, 0.42]
+Line sensor readings: [0.09, 0.40, 0.41, 0.36, 0.12]
