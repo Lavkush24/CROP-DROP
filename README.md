@@ -554,6 +554,10 @@ float compute_line_conf(float *r)
 
 [![Task 4 run — black line](v1.png)](https://youtu.be/oO3rsXFNNNE)
 
+### Task 4 —  Box pickup run
+
+[![Task 4 run — alternate angle](box.png)](https://youtu.be/H0FVPsiAQus)
+
 ---
 
 ## Results
